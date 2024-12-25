@@ -21,7 +21,7 @@ class PipelineFactory {
                         this.model === "onnx-community/whisper-large-v3-turbo"
                             ? "fp16"
                             : "fp32",
-                    decoder_model_merged: "q4", // or 'fp32' ('fp16' is broken)
+                    decoder_model_merged: "q4",
                 },
                 device: "webgpu",
                 progress_callback,
@@ -36,8 +36,6 @@ class PipelineFactory {
 self.addEventListener("message", async (event) => {
     const message = event.data;
 
-    // Do some work...
-    // TODO use message data
     let transcript = await transcribe(message);
     if (transcript === null) return;
 
