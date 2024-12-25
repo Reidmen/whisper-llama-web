@@ -122,7 +122,8 @@ export function useLlama() {
 
             console.log('🦙 Generating with messages:', messages);
 
-            const result = await currentModel(messages, {
+            // Ensure we await the model's response
+            const result = await (await currentModel)(messages, {
                 max_new_tokens: 512,
                 temperature: 0.7,
                 top_p: 0.95,
