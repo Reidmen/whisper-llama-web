@@ -16,7 +16,8 @@ export default function AIResponse({ aiState }: Props) {
                     <h3 className="font-semibold mb-2">Downloading Model...</h3>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-2">
                         <div
-                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                            className={`h-2.5 rounded-full transition-all duration-300 ${aiState.isLoading ? 'animate-pulse-green bg-green-600' : 'bg-blue-600'
+                                }`}
                             style={{ width: `${aiState.downloadProgress.progress}%` }}
                         ></div>
                     </div>
@@ -31,7 +32,7 @@ export default function AIResponse({ aiState }: Props) {
             )}
 
             {aiState.isLoading && !aiState.downloadProgress && (
-                <div className="animate-pulse bg-gray-100 rounded-lg p-4">
+                <div className="animate-pulse-green bg-green-600 text-white rounded-lg p-4">
                     Loading AI response...
                 </div>
             )}
