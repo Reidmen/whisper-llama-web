@@ -25,7 +25,7 @@ function App() {
         };
 
         initializeLlama();
-    }, [llama.initModel]); // Add llama.initModel as dependency
+    }, [llama.initModel]);
 
     // Process transcription with Llama when transcription is complete
     useEffect(() => {
