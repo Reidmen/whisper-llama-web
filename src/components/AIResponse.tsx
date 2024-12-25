@@ -16,17 +16,16 @@ export default function AIResponse({ aiState }: Props) {
                     <h3 className="font-semibold mb-2">Downloading Model...</h3>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-2">
                         <div
-                            className={`h-2.5 rounded-full transition-all duration-300 ${aiState.isLoading ? 'animate-pulse-green bg-green-600' : 'bg-blue-600'
-                                }`}
-                            style={{ width: `${aiState.downloadProgress.progress}%` }}
+                            className={`h-2.5 rounded-full transition-all duration-300 ${aiState.isLoading ? 'animate-pulse-green bg-green-600' : 'bg-blue-600'}`}
+                            style={{ width: `${aiState.downloadProgress.progress || 0}%` }}
                         ></div>
                     </div>
                     <p className="text-sm text-gray-600">
-                        {`${(aiState.downloadProgress.loaded / 1024 / 1024).toFixed(2)}MB / ${(aiState.downloadProgress.total / 1024 / 1024).toFixed(2)}MB`}
-                        {` (${aiState.downloadProgress.progress}%)`}
+                        {`${((aiState.downloadProgress.loaded || 0) / 1024 / 1024).toFixed(2)}MB / ${((aiState.downloadProgress.total || 0) / 1024 / 1024).toFixed(2)}MB`}
+                        {aiState.downloadProgress.total ? ` (${aiState.downloadProgress.progress || 0}%)` : ''}
                     </p>
                     <p className="text-sm text-gray-600 capitalize">
-                        Status: {aiState.downloadProgress.status}
+                        Status: {aiState.downloadProgress.status || 'Initializing'}
                     </p>
                 </div>
             )}

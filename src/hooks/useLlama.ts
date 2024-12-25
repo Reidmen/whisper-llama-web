@@ -43,15 +43,7 @@ export function useLlama() {
                             const progress = Math.round((loaded / total) * 100);
                             const status = data.status || 'downloading';
 
-                            setLlamaState(prev => ({
-                                ...prev,
-                                downloadProgress: {
-                                    status,
-                                    loaded,
-                                    total,
-                                    progress
-                                }
-                            }));
+                            handleProgress(status, loaded, total, progress);
                         }
                     }
                 );
@@ -77,6 +69,27 @@ export function useLlama() {
         }
         return modelRef.current;
     }, []);
+
+    const handleProgress = (status: string, loaded: number, total: number, progress: number) => {
+        // Round progress to nearest integer
+        const roundedProgress = Math.round(progress);
+
+        // Only update state at 0, 25, 50, 75, and 100 percent
+        if (roundedProgress === 0 || roundedProgress === 25 ||
+            roundedProgress === 50 || roundedProgress === 75 ||
+            roundedProgress === 100 || status === 'done') {
+
+            setLlamaState(prev => ({
+                ...prev,
+                downloadProgress: {
+                    status,
+                    loaded,
+                    total,
+                    progress: roundedProgress
+                }
+            }));
+        }
+    };
 
     const generateResponse = useCallback(async (transcript: string) => {
         try {

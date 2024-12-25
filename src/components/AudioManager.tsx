@@ -134,6 +134,7 @@ const MODELS = Object.entries({
     "onnx-community/distil-small.en": 538, // 353 + 185
 });
 
+// Use one single audio source, remove url and file
 export enum AudioSource {
     URL = "URL",
     FILE = "FILE",
@@ -144,11 +145,11 @@ export function AudioManager(props: { transcriber: Transcriber }) {
     const [progress, setProgress] = useState<number | undefined>(0);
     const [audioData, setAudioData] = useState<
         | {
-              buffer: AudioBuffer;
-              url: string;
-              source: AudioSource;
-              mimeType: string;
-          }
+            buffer: AudioBuffer;
+            url: string;
+            source: AudioSource;
+            mimeType: string;
+        }
         | undefined
     >(undefined);
     const [audioDownloadUrl, setAudioDownloadUrl] = useState<
@@ -466,7 +467,7 @@ function SettingsModal(props: {
                 </>
             }
             onClose={props.onClose}
-            onSubmit={() => {}}
+            onSubmit={() => { }}
         />
     );
 }
@@ -627,7 +628,7 @@ function RecordTile(props: {
             <RecordModal
                 show={showModal}
                 onSubmit={onSubmit}
-                onProgress={(_data) => {}}
+                onProgress={(_data) => { }}
                 onClose={onClose}
             />
         </>
