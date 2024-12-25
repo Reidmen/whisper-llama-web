@@ -1,4 +1,3 @@
- 
 import { pipeline, WhisperTextStreamer } from "@huggingface/transformers";
 
 // Define model factories
@@ -15,6 +14,7 @@ class PipelineFactory {
 
     static async getInstance(progress_callback = null) {
         if (this.instance === null) {
+            console.log('🎯 Creating new pipeline instance for:', this.model);
             this.instance = pipeline(this.task, this.model, {
                 dtype: {
                     encoder_model:
@@ -26,6 +26,7 @@ class PipelineFactory {
                 device: "webgpu",
                 progress_callback,
             });
+            console.log('🎯 Pipeline instance created successfully');
         }
 
         return this.instance;
@@ -53,23 +54,33 @@ class AutomaticSpeechRecognitionPipelineFactory extends PipelineFactory {
 }
 
 const transcribe = async ({ audio, model, subtask, language }) => {
-    const isDistilWhisper = model.startsWith("distil-whisper/");
+    console.log('🎤 Starting transcription with:', {
+        model,
+        subtask,
+        language,
+        audioLength: audio?.length
+    });
 
+    const isDistilWhisper = model.startsWith("distil-whisper/");
     const p = AutomaticSpeechRecognitionPipelineFactory;
+
     if (p.model !== model) {
-        // Invalidate model if different
+        console.log('🔄 Model change detected, reinitializing pipeline');
         p.model = model;
 
         if (p.instance !== null) {
+            console.log('🗑️ Disposing old model instance');
             (await p.getInstance()).dispose();
             p.instance = null;
         }
     }
 
-    // Load transcriber model
+    console.log('🎯 Loading transcriber model...');
     const transcriber = await p.getInstance((data) => {
+        console.log('📊 Model loading progress:', data);
         self.postMessage(data);
     });
+    console.log('✅ Transcriber model loaded successfully');
 
     const time_precision =
         transcriber.processor.feature_extractor.config.chunk_length /
@@ -132,7 +143,7 @@ const transcribe = async ({ audio, model, subtask, language }) => {
         },
     });
 
-    // Actually run transcription
+    console.log('🎤 Starting transcription process...');
     const output = await transcriber(audio, {
         // Greedy
         top_k: 0,
@@ -153,13 +164,14 @@ const transcribe = async ({ audio, model, subtask, language }) => {
         // Callback functions
         streamer, // after each generation step
     }).catch((error) => {
-        console.error(error);
+        console.error('❌ Transcription error:', error);
         self.postMessage({
             status: "error",
             data: error,
         });
         return null;
     });
+    console.log('✅ Transcription completed successfully');
 
     return {
         tps,

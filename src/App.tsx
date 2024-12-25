@@ -1,24 +1,41 @@
 import { AudioManager } from "./components/AudioManager";
 import Transcript from "./components/Transcript";
+import AIResponse from "./components/AIResponse";
 import { useTranscriber } from "./hooks/useTranscriber";
+import { useLlama } from "./hooks/useLlama";
+import { useEffect } from "react";
 
 // @ts-ignore
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
 
 function App() {
     const transcriber = useTranscriber();
+    const llama = useLlama();
+
+    // Initialize Llama model when the app loads
+    useEffect(() => {
+        llama.initModel();
+    }, [llama.initModel]);
+
+    // Process transcription with Llama when transcription is complete
+    useEffect(() => {
+        if (transcriber.output && !transcriber.output.isBusy && transcriber.output.text) {
+            llama.generateResponse(transcriber.output.text);
+        }
+    }, [transcriber.output, llama.generateResponse]);
 
     return IS_WEBGPU_AVAILABLE ? (
         <div className='flex justify-center items-center min-h-screen'>
             <div className='container flex flex-col justify-center items-center'>
                 <h1 className='text-5xl font-extrabold tracking-tight text-slate-900 sm:text-7xl text-center'>
-                    Whisper WebGPU
+                    Whisper WebGPU + Llama
                 </h1>
                 <h2 className='mt-3 mb-5 px-4 text-center text-1xl font-semibold tracking-tight text-slate-900 sm:text-2xl'>
-                    ML-powered speech recognition directly in your browser
+                    ML-powered speech recognition with AI responses
                 </h2>
                 <AudioManager transcriber={transcriber} />
                 <Transcript transcribedData={transcriber.output} />
+                <AIResponse aiState={llama} />
             </div>
 
             <div className='absolute bottom-4'>
