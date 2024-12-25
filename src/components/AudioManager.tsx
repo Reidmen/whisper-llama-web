@@ -8,6 +8,12 @@ import Constants from "../utils/Constants";
 import { Transcriber } from "../hooks/useTranscriber";
 import Progress from "./Progress";
 import AudioRecorder from "./AudioRecorder";
+import { env } from '@huggingface/transformers';
+
+// Configure caching settings at the top of the file
+env.useBrowserCache = true; // Enable browser caching
+env.cacheDir = './.cache'; // Set cache directory (optional)
+env.allowLocalModels = true; // Allow loading cached models
 
 function titleCase(str: string) {
     str = str.toLowerCase();
@@ -392,9 +398,11 @@ function SettingsModal(props: {
             title={"Settings"}
             content={
                 <>
-                    <label>Select the model to use.</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select the model to use
+                    </label>
                     <select
-                        className='mt-1 mb-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                        className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                         value={props.transcriber.model}
                         onChange={(e) => {
                             props.transcriber.setModel(e.target.value);
@@ -404,63 +412,70 @@ function SettingsModal(props: {
                             <option
                                 key={key}
                                 value={id}
-                            >{`${id} (${size}MB)`}</option>
+                                className={`${id === props.transcriber.model
+                                    ? 'bg-green-100 text-green-800'
+                                    : ''
+                                    }`}
+                            >
+                                {`${id} (${size}MB)`}
+                            </option>
                         ))}
                     </select>
-                    <div className='flex justify-end items-center mb-3 px-1'>
-                        <div className='flex'>
-                            <input
-                                id='multilingual'
-                                type='checkbox'
-                                checked={props.transcriber.multilingual}
-                                onChange={(e) => {
-                                    let model = Constants.DEFAULT_MODEL;
-                                    if (!e.target.checked) {
-                                        model += ".en";
-                                    }
-                                    props.transcriber.setModel(model);
-                                    props.transcriber.setMultilingual(
-                                        e.target.checked,
-                                    );
-                                }}
-                            ></input>
-                            <label htmlFor={"multilingual"} className='ms-1'>
-                                Multilingual
-                            </label>
-                        </div>
+
+                    <div className='flex items-center space-x-2 mb-4'>
+                        <input
+                            id='multilingual'
+                            type='checkbox'
+                            checked={props.transcriber.multilingual}
+                            onChange={(e) => {
+                                let model = Constants.DEFAULT_MODEL;
+                                if (!e.target.checked) {
+                                    model += ".en";
+                                }
+                                props.transcriber.setModel(model);
+                                props.transcriber.setMultilingual(e.target.checked);
+                            }}
+                            className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <label
+                            htmlFor="multilingual"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            Enable multilingual support
+                        </label>
                     </div>
+
                     {props.transcriber.multilingual && (
                         <>
-                            <label>Select the source language.</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Select language
+                            </label>
                             <select
-                                className='mt-1 mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                                defaultValue={props.transcriber.language}
+                                className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                value={props.transcriber.language}
                                 onChange={(e) => {
-                                    props.transcriber.setLanguage(
-                                        e.target.value,
-                                    );
+                                    props.transcriber.setLanguage(e.target.value);
                                 }}
                             >
-                                {Object.keys(LANGUAGES).map((key, i) => (
-                                    <option key={key} value={key}>
-                                        {names[i]}
+                                {names.map((name) => (
+                                    <option key={name} value={name.toLowerCase()}>
+                                        {name}
                                     </option>
                                 ))}
                             </select>
-                            <label>Select the task to perform.</label>
+
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Select the task to perform
+                            </label>
                             <select
-                                className='mt-1 mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                                defaultValue={props.transcriber.subtask}
+                                className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                value={props.transcriber.subtask}
                                 onChange={(e) => {
-                                    props.transcriber.setSubtask(
-                                        e.target.value,
-                                    );
+                                    props.transcriber.setSubtask(e.target.value);
                                 }}
                             >
-                                <option value={"transcribe"}>Transcribe</option>
-                                <option value={"translate"}>
-                                    Translate (to English)
-                                </option>
+                                <option value="transcribe">Transcribe</option>
+                                <option value="translate">Translate (to English)</option>
                             </select>
                         </>
                     )}

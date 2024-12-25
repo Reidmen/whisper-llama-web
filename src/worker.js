@@ -75,7 +75,7 @@ const transcribe = async ({ audio, model, subtask, language }) => {
 
     console.log('🎯 Loading transcriber model...');
     const transcriber = await p.getInstance((data) => {
-        console.log('📊 Model loading progress:', data);
+        // console.log('📊 Model loading progress:', data);
         self.postMessage(data);
     });
     console.log('✅ Transcriber model loaded successfully');
