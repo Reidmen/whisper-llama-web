@@ -100,7 +100,7 @@ export function useLlama() {
 
     const generateResponse = useCallback(async (transcript: string) => {
         try {
-            console.log('🦙 Attempting to generate response...');
+            console.log('🦙 Attempting to generate response from transcript:', transcript);
             let currentModel = model;
             if (!currentModel) {
                 console.log('🦙 Model not found, initializing...');
@@ -114,21 +114,15 @@ export function useLlama() {
 
             setLlamaState(prev => ({ ...prev, isLoading: true }));
 
-            // Format the input as a string
-            const messages = [
-                { role: "system", content: "You are a helpful assistant." },
-                { role: "user", content: transcript }
-            ];
+            // Format the prompt as a simple string instead of messages array
+            const prompt = [{ role: "system", content: "You are a helpful assistant." }, { role: "user", content: transcript }];
 
-            console.log('🦙 Generating with messages:', messages);
+            console.log('🦙 Generating with prompt:', prompt);
 
             // Ensure we await the model's response
-            const result = await (await currentModel)(messages, {
-                max_new_tokens: 512,
-                temperature: 0.7,
+            const result = await (await currentModel)(prompt, {
+                max_new_tokens: 128,
                 top_p: 0.95,
-                repetition_penalty: 1.1,
-                do_sample: true
             });
 
             console.log('🦙 Response generated successfully:', result);
