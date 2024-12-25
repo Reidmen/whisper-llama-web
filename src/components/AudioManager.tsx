@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "./modal/Modal";
-import { UrlInput } from "./modal/UrlInput";
-import AudioPlayer from "./AudioPlayer";
 import { TranscribeButton } from "./TranscribeButton";
 import Constants from "../utils/Constants";
 import { Transcriber } from "../hooks/useTranscriber";
@@ -256,14 +254,6 @@ export function AudioManager(props: { transcriber: Transcriber }) {
         <>
             <div className='flex flex-col justify-center items-center rounded-lg bg-white shadow-xl shadow-black/5 ring-1 ring-slate-700/10'>
                 <div className='flex flex-row space-x-2 py-2 w-full px-2'>
-                    <UrlTile
-                        icon={<AnchorIcon />}
-                        text={"From URL"}
-                        onUrlUpdate={(e) => {
-                            props.transcriber.onInputChange();
-                            setAudioDownloadUrl(e);
-                        }}
-                    />
                     <VerticalBar />
                     <FileTile
                         icon={<FolderIcon />}
@@ -303,11 +293,6 @@ export function AudioManager(props: { transcriber: Transcriber }) {
 
             {audioData && (
                 <>
-                    <AudioPlayer
-                        audioUrl={audioData.url}
-                        mimeType={audioData.mimeType}
-                    />
-
                     <div className='relative w-full flex justify-center items-center'>
                         <TranscribeButton
                             onClick={() => {
@@ -506,66 +491,6 @@ function ProgressBar(props: { progress: string }) {
     );
 }
 
-function UrlTile(props: {
-    icon: JSX.Element;
-    text: string;
-    onUrlUpdate: (url: string) => void;
-}) {
-    const [showModal, setShowModal] = useState(false);
-
-    const onClick = () => {
-        setShowModal(true);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
-
-    const onSubmit = (url: string) => {
-        props.onUrlUpdate(url);
-        onClose();
-    };
-
-    return (
-        <>
-            <Tile icon={props.icon} text={props.text} onClick={onClick} />
-            <UrlModal show={showModal} onSubmit={onSubmit} onClose={onClose} />
-        </>
-    );
-}
-
-function UrlModal(props: {
-    show: boolean;
-    onSubmit: (url: string) => void;
-    onClose: () => void;
-}) {
-    const [url, setUrl] = useState(Constants.DEFAULT_AUDIO_URL);
-
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setUrl(event.target.value);
-    };
-
-    const onSubmit = () => {
-        props.onSubmit(url);
-    };
-
-    return (
-        <Modal
-            show={props.show}
-            title={"From URL"}
-            content={
-                <>
-                    {"Enter the URL of the audio file you want to load."}
-                    <UrlInput onChange={onChange} value={url} />
-                </>
-            }
-            onClose={props.onClose}
-            submitText={"Load"}
-            onSubmit={onSubmit}
-        />
-    );
-}
-
 function FileTile(props: {
     icon: JSX.Element;
     text: string;
@@ -715,23 +640,6 @@ function Tile(props: {
     );
 }
 
-function AnchorIcon() {
-    return (
-        <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth='1.5'
-            stroke='currentColor'
-        >
-            <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244'
-            />
-        </svg>
-    );
-}
 
 function FolderIcon() {
     return (

@@ -37,13 +37,17 @@ function App() {
 
     return IS_WEBGPU_AVAILABLE ? (
         <div className='flex justify-center items-center min-h-screen'>
-            <div className='container flex flex-col justify-center items-center'>
-                <h3 className='text-5xl font-extrabold tracking-tight text-slate-900 sm:text-7xl text-center'>
-                    Whisper WebGPU + Llama 3.2
-                </h3>
-                <AudioManager transcriber={transcriber} />
-                <Transcript transcribedData={transcriber.output} />
-                <AIResponse aiState={llama} />
+            <div className='container flex flex-col justify-between min-h-screen'>
+                <div className='flex-1 overflow-y-auto'>
+                    <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl text-center mt-4'>
+                        Whisper WebGPU + Llama 3.2
+                    </h3>
+                    <AIResponse aiState={llama} />
+                </div>
+                <div className='sticky bottom-0 bg-white pb-4'>
+                    <AudioManager transcriber={transcriber} />
+                    <Transcript transcribedData={transcriber.output} />
+                </div>
             </div>
         </div>
     ) : (
