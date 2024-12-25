@@ -27,14 +27,14 @@ export default function Transcript({ transcribedData }: Props) {
                         {chunk.text}
                     </div>
                 ))}
-            {transcribedData?.tps && (
+            {/* {transcribedData?.tps && (
                 <p className='text-sm text-center mt-4 mb-1'>
                     <span className='font-semibold text-black'>
                         {transcribedData?.tps.toFixed(2)}
                     </span>{" "}
                     <span className='text-gray-500'>tokens/second</span>
                 </p>
-            )}
+            )} */}
         </div>
     );
 }
