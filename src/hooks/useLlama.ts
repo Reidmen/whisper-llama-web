@@ -16,9 +16,10 @@ export function useLlama() {
     const [model, setModel] = useState<any>(null);
 
     const initModel = useCallback(async () => {
+        console.log('🦙 Checking model initialization status...');
         if (!model) {
             try {
-                console.log('🦙 Initializing Llama model...');
+                console.log('🦙 Starting model initialization...');
                 setLlamaState(prev => ({ ...prev, isLoading: true }));
                 const pipe = await pipeline(
                     'text-generation',
@@ -27,32 +28,43 @@ export function useLlama() {
                         device: 'webgpu'
                     }
                 );
-                console.log('🦙 Llama model loaded successfully');
+                console.log('🦙 Pipeline created successfully');
                 setModel(pipe);
                 setLlamaState(prev => ({ ...prev, isLoading: false }));
+                console.log('🦙 Model initialization complete');
+                return pipe;
             } catch (error) {
+                console.error('🦙 Model initialization failed:', error);
                 setLlamaState(prev => ({
                     ...prev,
                     isLoading: false,
                     error: 'Failed to load model'
                 }));
+                throw error;
             }
         }
-    }, [model]);
+        return model;
+    }, []);
 
     const generateResponse = useCallback(async (transcript: string) => {
-        if (!model) {
-            console.log('🦙 Model not initialized, skipping response generation');
-            return;
-        }
-
         try {
-            console.log('🦙 Generating response for transcript:', transcript);
-            setLlamaState(prev => ({ ...prev, isLoading: true }));
+            console.log('🦙 Attempting to generate response...');
+            let currentModel = model;
+            if (!currentModel) {
+                console.log('🦙 Model not found, initializing...');
+                currentModel = await initModel();
+            }
 
+            if (!currentModel) {
+                console.error('🦙 Model initialization failed');
+                return;
+            }
+
+            setLlamaState(prev => ({ ...prev, isLoading: true }));
             const prompt = `<s>[INST] ${transcript} [/INST]`;
-            console.log('🦙 Using prompt:', prompt);
-            const result = await model.generate(prompt, {
+            console.log('🦙 Generating with prompt:', prompt);
+
+            const result = await currentModel.generate(prompt, {
                 max_new_tokens: 512,
                 temperature: 0.7,
                 top_p: 0.95,
@@ -67,6 +79,7 @@ export function useLlama() {
                 response: result[0].generated_text
             }));
         } catch (error) {
+            console.error('🦙 Error generating response:', error);
             setLlamaState(prev => ({
                 ...prev,
                 isLoading: false,

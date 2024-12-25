@@ -12,14 +12,25 @@ function App() {
     const transcriber = useTranscriber();
     const llama = useLlama();
 
-    // Initialize Llama model when the app loads
+    // Initialize Llama model immediately when component mounts
     useEffect(() => {
-        llama.initModel();
-    }, [llama.initModel]);
+        console.log('🚀 Starting automatic Llama initialization...');
+        const initializeLlama = async () => {
+            try {
+                await llama.initModel();
+                console.log('✅ Llama initialized automatically on app load');
+            } catch (error) {
+                console.error('❌ Failed to initialize Llama:', error);
+            }
+        };
+
+        initializeLlama();
+    }, [llama.initModel]); // Add llama.initModel as dependency
 
     // Process transcription with Llama when transcription is complete
     useEffect(() => {
         if (transcriber.output && !transcriber.output.isBusy && transcriber.output.text) {
+            console.log('🎯 New transcription detected, generating response...');
             llama.generateResponse(transcriber.output.text);
         }
     }, [transcriber.output, llama.generateResponse]);
@@ -36,16 +47,6 @@ function App() {
                 <AudioManager transcriber={transcriber} />
                 <Transcript transcribedData={transcriber.output} />
                 <AIResponse aiState={llama} />
-            </div>
-
-            <div className='absolute bottom-4'>
-                Made with{" "}
-                <a
-                    className='underline'
-                    href='https://github.com/xenova/transformers.js'
-                >
-                    🤗 Transformers.js
-                </a>
             </div>
         </div>
     ) : (
