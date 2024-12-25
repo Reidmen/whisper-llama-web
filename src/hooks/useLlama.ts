@@ -1,10 +1,20 @@
 import { useState, useCallback } from 'react';
-import { pipeline } from "@huggingface/transformers";
+import { pipeline, env } from "@huggingface/transformers";
+
+// Enable caching
+env.cacheDir = './.cache';
+env.localModelPath = './.cache';
 
 export interface LlamaResponse {
     isLoading: boolean;
     response: string;
     error?: string;
+    downloadProgress?: {
+        status: string;
+        loaded: number;
+        total: number;
+        progress: number;
+    };
 }
 
 export function useLlama() {
@@ -13,7 +23,7 @@ export function useLlama() {
         response: ''
     });
 
-    const [model, setModel] = useState<any>(null);
+    const [model, setModel] = useState<any>(undefined);
 
     const initModel = useCallback(async () => {
         console.log('🦙 Checking model initialization status...');
@@ -21,24 +31,66 @@ export function useLlama() {
             try {
                 console.log('🦙 Starting model initialization...');
                 setLlamaState(prev => ({ ...prev, isLoading: true }));
+                const significantProgressPoints = [25, 50, 75, 99];
+
                 const pipe = await pipeline(
                     'text-generation',
                     'onnx-community/Llama-3.2-1B-Instruct-q4f16',
                     {
-                        device: 'webgpu'
+                        device: 'webgpu',
+                        progress_callback: (data: any) => {
+                            const loaded = data.loaded || 0;
+                            const total = data.total || 0;
+                            const progress = Math.round((loaded / total) * 100);
+                            const status = data.status || 'downloading';
+
+                            if (significantProgressPoints.includes(progress)) {
+                                console.log(`🦙 Model ${status}: ${progress}% (${(loaded / 1024 / 1024).toFixed(2)}MB / ${(total / 1024 / 1024).toFixed(2)}MB)`);
+                            }
+
+                            setLlamaState(prev => ({
+                                ...prev,
+                                downloadProgress: {
+                                    status,
+                                    loaded,
+                                    total,
+                                    progress
+                                }
+                            }));
+
+                            // Save progress to localStorage
+                            localStorage.setItem('llamaDownloadProgress', JSON.stringify({
+                                status,
+                                loaded,
+                                total,
+                                progress,
+                                timestamp: Date.now()
+                            }));
+                        }
                     }
                 );
+
                 console.log('🦙 Pipeline created successfully');
                 setModel(pipe);
-                setLlamaState(prev => ({ ...prev, isLoading: false }));
+                setLlamaState(prev => ({
+                    ...prev,
+                    isLoading: false,
+                    downloadProgress: undefined
+                }));
                 console.log('🦙 Model initialization complete');
+
+                // Save model initialization status
+                localStorage.setItem('llamaModelInitialized', 'true');
+                localStorage.setItem('llamaModelLastInit', Date.now().toString());
+
                 return pipe;
             } catch (error) {
                 console.error('🦙 Model initialization failed:', error);
                 setLlamaState(prev => ({
                     ...prev,
                     isLoading: false,
-                    error: 'Failed to load model'
+                    error: 'Failed to load model',
+                    downloadProgress: undefined
                 }));
                 throw error;
             }
@@ -61,10 +113,16 @@ export function useLlama() {
             }
 
             setLlamaState(prev => ({ ...prev, isLoading: true }));
-            const prompt = `<s>[INST] ${transcript} [/INST]`;
-            console.log('🦙 Generating with prompt:', prompt);
 
-            const result = await currentModel.generate(prompt, {
+            // Format the input as a string
+            const messages = [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: transcript }
+            ];
+
+            console.log('🦙 Generating with messages:', messages);
+
+            const result = await currentModel(messages, {
                 max_new_tokens: 512,
                 temperature: 0.7,
                 top_p: 0.95,
@@ -72,7 +130,7 @@ export function useLlama() {
                 do_sample: true
             });
 
-            console.log('🦙 Response generated successfully');
+            console.log('🦙 Response generated successfully:', result);
             setLlamaState(prev => ({
                 ...prev,
                 isLoading: false,
