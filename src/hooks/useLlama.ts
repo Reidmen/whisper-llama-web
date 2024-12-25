@@ -5,9 +5,16 @@ import { pipeline, env } from "@huggingface/transformers";
 env.cacheDir = './.cache';
 env.localModelPath = './.cache';
 
+export interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: number;
+}
+
 export interface LlamaResponse {
     isLoading: boolean;
     response: string;
+    history: ChatMessage[];
     error?: string;
     downloadProgress?: {
         status: string;
@@ -20,7 +27,8 @@ export interface LlamaResponse {
 export function useLlama() {
     const [llamaState, setLlamaState] = useState<LlamaResponse>({
         isLoading: false,
-        response: ''
+        response: '',
+        history: []
     });
 
     const modelRef = useRef<any>(null);
@@ -108,13 +116,21 @@ export function useLlama() {
             setLlamaState(prev => ({
                 ...prev,
                 isLoading: true,
-                error: undefined, // Clear any previous errors
-                response: '' // Clear previous response
+                error: undefined,
+                history: [...prev.history, {
+                    role: 'user',
+                    content: transcript,
+                    timestamp: Date.now()
+                }]
             }));
 
-            // Format the prompt for better instruction following
+            // Format the prompt including chat history
             const formattedPrompt = [
                 { role: 'system', content: 'You are a helpful assistant.' },
+                ...llamaState.history.map(msg => ({
+                    role: msg.role,
+                    content: msg.content
+                })),
                 { role: 'user', content: transcript }
             ];
 
@@ -133,7 +149,12 @@ export function useLlama() {
             setLlamaState(prev => ({
                 ...prev,
                 isLoading: false,
-                response: generatedText
+                response: generatedText,
+                history: [...prev.history, {
+                    role: 'assistant',
+                    content: generatedText,
+                    timestamp: Date.now()
+                }]
             }));
         } catch (error) {
             console.error('🦙 Error generating response:', error);

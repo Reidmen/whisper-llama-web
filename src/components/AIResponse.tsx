@@ -1,11 +1,26 @@
-import { LlamaResponse } from '../hooks/useLlama';
+import { LlamaResponse, ChatMessage as ChatMessageLlama } from '../hooks/useLlama';
 
-interface Props {
-    aiState: LlamaResponse;
+function ChatMessage({ message }: { message: ChatMessageLlama }) {
+    return (
+        <div className={`flex ${message.role === 'assistant' ? 'justify-start' : 'justify-end'} mb-4`}>
+            <div className={`max-w-[80%] rounded-lg p-4 ${message.role === 'assistant'
+                ? 'bg-blue-50 text-slate-700'
+                : 'bg-indigo-50 text-slate-700'
+                }`}>
+                <p className="text-sm font-semibold mb-1">
+                    {message.role === 'assistant' ? 'AI Assistant' : 'You'}
+                </p>
+                <p className="whitespace-pre-wrap">{message.content}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                </p>
+            </div>
+        </div>
+    );
 }
 
-export default function AIResponse({ aiState }: Props) {
-    if (!aiState.response && !aiState.isLoading && !aiState.error && !aiState.downloadProgress) {
+export default function AIResponse({ aiState }: { aiState: LlamaResponse }) {
+    if (!aiState.history.length && !aiState.isLoading && !aiState.error && !aiState.downloadProgress) {
         return null;
     }
 
@@ -30,6 +45,12 @@ export default function AIResponse({ aiState }: Props) {
                 </div>
             )}
 
+            <div className="flex flex-col space-y-4">
+                {aiState.history.map((message, index) => (
+                    <ChatMessage key={`${message.timestamp}-${index}`} message={message} />
+                ))}
+            </div>
+
             {aiState.isLoading && !aiState.downloadProgress && (
                 <div className="animate-pulse-green bg-green-600 text-white rounded-lg p-4">
                     Loading AI response...
@@ -39,13 +60,6 @@ export default function AIResponse({ aiState }: Props) {
             {aiState.error && (
                 <div className="bg-red-100 text-red-700 rounded-lg p-4">
                     {aiState.error}
-                </div>
-            )}
-
-            {aiState.response && !aiState.isLoading && (
-                <div className="bg-blue-50 rounded-lg p-4 shadow-xl shadow-black/5 ring-1 ring-slate-700/10">
-                    <h3 className="font-semibold mb-2">AI Response:</h3>
-                    <p className="whitespace-pre-wrap">{aiState.response}</p>
                 </div>
             )}
         </div>
