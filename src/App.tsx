@@ -40,13 +40,16 @@ function App() {
             <div className='container flex flex-col justify-between min-h-screen'>
                 <div className='flex-1 overflow-y-auto'>
                     <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl text-center mt-4'>
-                        Whisper WebGPU + Llama 3.2
+                        Whisper WebGPU + Llama 3.2 🦙 (Fully Secret)
                     </h3>
                     <AIResponse aiState={llama} />
                 </div>
                 <div className='sticky bottom-0 bg-white pb-4'>
                     <AudioManager transcriber={transcriber} />
                     <Transcript transcribedData={transcriber.output} />
+                    <p className='text-center text-sm text-gray-500 mt-4 hover:text-blue-600 transition-colors duration-300'>
+                        Created by 🔮 <a href="https://github.com/Reidmen" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-blue-800">Reidmen</a> 🚀, Template and inspiration by <a href="https://github.com/xenova" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">Xenova</a>
+                    </p>
                 </div>
             </div>
         </div>

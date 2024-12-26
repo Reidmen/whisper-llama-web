@@ -1,20 +1,24 @@
+---
+title: Whisper WebGPU + Llama Chat
+emoji: 🎙️🦙
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # Whisper Web + Llama 3.2
 
 ML-powered speech recognition and AI responses in your browser!
 
 ## Features
-
-- 🎙️ Real-time speech recognition using Whisper models
-- 🤖 AI responses powered by Llama 3.2
-- 🌐 Support for multiple languages
-- 📱 Responsive design with mobile support
+- 🎤 Real-time speech recognition using Whisper
+- 🦙 Chat interactions using Llama 3.2
 - ⚡ WebGPU acceleration for optimal performance
-- 🎯 Multiple input options:
-  - File upload
-  - URL input
-  - Real-time recording
-
-## Available Models
+- 🌐 Runs entirely in the browser - no server required
+- 🔊 Support for multiple audio input formats
+- 🌍 Multilingual support
 
 ### Speech Recognition (Whisper)
 - Tiny (120MB)
@@ -65,6 +69,9 @@ The architecture consists of:
 - Real-time audio processing and transcription
 - Streaming response generation
 
-## Browser Support
+## Build and run with Docker
 
-Currently requires a browser with WebGPU support.
+```bash
+docker build -t whisper-web .
+docker run -p 7860:7860 whisper-web
+```
