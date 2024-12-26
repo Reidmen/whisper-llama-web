@@ -3,7 +3,7 @@ import Transcript from "./components/Transcript";
 import AIResponse from "./components/AIResponse";
 import { useTranscriber } from "./hooks/useTranscriber";
 import { useLlama } from "./hooks/useLlama";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // @ts-ignore
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
@@ -11,6 +11,18 @@ const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
 function App() {
     const transcriber = useTranscriber();
     const llama = useLlama();
+
+    // Add ref for the messages container
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Add auto-scroll effect
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [llama.response]); // Scroll when new response is added
 
     // Initialize Llama model immediately when component mounts
     useEffect(() => {
@@ -39,10 +51,13 @@ function App() {
         <div className='flex justify-center items-center min-h-screen'>
             <div className='container flex flex-col justify-between min-h-screen'>
                 <div className='flex-1 overflow-y-auto'>
-                    <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl text-center mt-4'>
+                    <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl text-center mt-4 sticky top-0 bg-white'>
                         Whisper WebGPU + Llama 3.2 🦙 (Fully Secret)
                     </h3>
-                    <AIResponse aiState={llama} />
+                    <div className='overflow-y-auto h-[calc(100vh-200px)]'>
+                        <AIResponse aiState={llama} />
+                        <div ref={messagesEndRef} /> {/* Scroll anchor */}
+                    </div>
                 </div>
                 <div className='sticky bottom-0 bg-white pb-4'>
                     <AudioManager transcriber={transcriber} />
