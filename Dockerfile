@@ -1,5 +1,5 @@
-# Use Node.js as base image
-FROM node:20-slim
+# Build stage
+FROM node:20-slim AS builder
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -7,31 +7,34 @@ RUN npm install -g pnpm
 # Set working directory
 WORKDIR /app
 
-# Copy only package files first
-COPY package.json pnpm-lock.yaml* ./
+# Copy package files
+COPY package*.json pnpm-lock.yaml ./
 
-# Install dependencies
+# Install dependencies using pnpm
 RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN pnpm build
+RUN pnpm run build
 
-# Create a clean deployment with only dist files
-RUN mkdir -p /app/hf-space && \
-    cp -r dist/* /app/hf-space/ && \
-    cd /app && \
-    rm -rf * && \
-    mv hf-space/* . && \
-    rm -rf hf-space
+# Production stage
+FROM node:20-slim
 
-# Install serve
+WORKDIR /app
+
+# Install serve to run the built application
 RUN npm install -g serve
+
+# Copy only the built files from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Remove unnecessary files
+RUN rm -rf src node_modules
 
 # Expose port 7860
 EXPOSE 7860
 
-# Start the server
-CMD ["serve", "-s", ".", "-p", "7860"]
+# Start the application
+CMD ["serve", "-s", "dist", "-p", "7860"]
