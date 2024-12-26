@@ -196,7 +196,7 @@ function App() {
                                         </svg>
                                     </a>
                                     <span>•</span>
-                                    <span>Template by</span>
+                                    <span>Inspired by</span>
                                     <a
                                         href="https://github.com/xenova"
                                         target="_blank"

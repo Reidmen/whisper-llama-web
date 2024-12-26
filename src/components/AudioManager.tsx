@@ -365,7 +365,6 @@ function SettingsModal(props: {
     transcriber: Transcriber;
 }) {
     const names = Object.values(LANGUAGES).map(titleCase);
-
     const models = MODELS.filter(
         ([key, _value]) =>
             !props.transcriber.multilingual || !key.includes("/distil-"),
@@ -374,97 +373,127 @@ function SettingsModal(props: {
         size: value,
         id: `${key}${props.transcriber.multilingual || key.includes("/distil-") ? "" : ".en"}`,
     }));
+
     return (
         <Modal
             show={props.show}
-            title={"Settings"}
+            title={
+                <div className="flex items-center gap-3 mb-2">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-xl font-semibold">Settings</span>
+                </div>
+            }
             content={
-                <>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Select the model to use
-                    </label>
-                    <select
-                        className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                        value={props.transcriber.model}
-                        onChange={(e) => {
-                            props.transcriber.setModel(e.target.value);
-                        }}
-                    >
-                        {models.map(({ key, id, size }) => (
-                            <option
-                                key={key}
-                                value={id}
-                                className={`${id === props.transcriber.model
-                                    ? 'bg-green-100 text-green-800'
-                                    : ''
-                                    }`}
-                            >
-                                {`${id} (${size}MB)`}
-                            </option>
-                        ))}
-                    </select>
-
-                    <div className='flex items-center space-x-2 mb-4'>
-                        <input
-                            id='multilingual'
-                            type='checkbox'
-                            checked={props.transcriber.multilingual}
-                            onChange={(e) => {
-                                let model = Constants.DEFAULT_MODEL;
-                                if (!e.target.checked) {
-                                    model += ".en";
-                                }
-                                props.transcriber.setModel(model);
-                                props.transcriber.setMultilingual(e.target.checked);
-                            }}
-                            className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                        />
-                        <label
-                            htmlFor="multilingual"
-                            className="text-sm font-medium text-gray-700"
+                <div className="space-y-6">
+                    {/* Model Selection Card */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                            <label className="font-medium text-gray-900">Model Selection</label>
+                        </div>
+                        <select
+                            className='w-full p-2.5 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200'
+                            value={props.transcriber.model}
+                            onChange={(e) => props.transcriber.setModel(e.target.value)}
                         >
-                            Enable multilingual support
-                        </label>
+                            {models.map(({ key, id, size }) => (
+                                <option
+                                    key={key}
+                                    value={id}
+                                    className={`${id === props.transcriber.model ? 'bg-green-100 text-green-800' : ''}`}
+                                >
+                                    {`${id} (${size}MB)`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Multilingual Support Toggle */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                </svg>
+                                <label htmlFor="multilingual" className="font-medium text-gray-900">
+                                    Multilingual Support
+                                </label>
+                            </div>
+                            <input
+                                id='multilingual'
+                                type='checkbox'
+                                checked={props.transcriber.multilingual}
+                                onChange={(e) => {
+                                    let model = Constants.DEFAULT_MODEL;
+                                    if (!e.target.checked) {
+                                        model += ".en";
+                                    }
+                                    props.transcriber.setModel(model);
+                                    props.transcriber.setMultilingual(e.target.checked);
+                                }}
+                                className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 transition-colors duration-200"
+                            />
+                        </div>
                     </div>
 
                     {props.transcriber.multilingual && (
-                        <>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select language
-                            </label>
-                            <select
-                                className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                                value={props.transcriber.language}
-                                onChange={(e) => {
-                                    props.transcriber.setLanguage(e.target.value);
-                                }}
-                            >
-                                {names.map((name) => (
-                                    <option key={name} value={name.toLowerCase()}>
-                                        {name}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="space-y-4">
+                            {/* Language Selection */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                                    </svg>
+                                    <label className="font-medium text-gray-900">Language</label>
+                                </div>
+                                <select
+                                    className='w-full p-2.5 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200'
+                                    value={props.transcriber.language}
+                                    onChange={(e) => props.transcriber.setLanguage(e.target.value)}
+                                >
+                                    {names.map((name) => (
+                                        <option key={name} value={name.toLowerCase()}>{name}</option>
+                                    ))}
+                                </select>
+                            </div>
 
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select the task to perform
-                            </label>
-                            <select
-                                className='mt-1 mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                                value={props.transcriber.subtask}
-                                onChange={(e) => {
-                                    props.transcriber.setSubtask(e.target.value);
-                                }}
-                            >
-                                <option value="transcribe">Transcribe</option>
-                                <option value="translate">Translate (to English)</option>
-                            </select>
-                        </>
+                            {/* Task Selection */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                    </svg>
+                                    <label className="font-medium text-gray-900">Task</label>
+                                </div>
+                                <select
+                                    className='w-full p-2.5 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200'
+                                    value={props.transcriber.subtask}
+                                    onChange={(e) => props.transcriber.setSubtask(e.target.value)}
+                                >
+                                    <option value="transcribe">Transcribe</option>
+                                    <option value="translate">Translate to English</option>
+                                </select>
+                            </div>
+                        </div>
                     )}
-                </>
+                </div>
             }
             onClose={props.onClose}
-            onSubmit={() => { }}
+            submitText={
+                <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Settings
+                </div>
+            }
+            submitClassName="bg-blue-600 hover:bg-blue-700 text-white"
+            onSubmit={() => props.onSubmit("")}
         />
     );
 }
