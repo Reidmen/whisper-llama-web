@@ -548,17 +548,14 @@ function RecordModal(props: {
     return (
         <Modal
             show={props.show}
-            title={"From Recording"}
+            title={"Record audio"}
             content={
-                <>
-                    {"Record audio using your microphone"}
-                    <AudioRecorder
-                        onRecordingProgress={(blob) => {
-                            props.onProgress(blob);
-                        }}
-                        onRecordingComplete={onRecordingComplete}
-                    />
-                </>
+                <AudioRecorder
+                    onRecordingProgress={(blob) => {
+                        props.onProgress(blob);
+                    }}
+                    onRecordingComplete={onRecordingComplete}
+                />
             }
             onClose={onClose}
             submitText={"Load"}

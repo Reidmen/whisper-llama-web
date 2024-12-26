@@ -112,28 +112,50 @@ export default function AudioRecorder(props: {
     };
 
     return (
-        <div className='flex flex-col justify-center items-center'>
-            <button
-                type='button'
-                className={`m-2 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-all duration-200 ${recording
+        <div className='flex flex-col justify-center items-center w-full'>
+            <div className='flex flex-row gap-2 items-center'>
+                <button
+                    type='button'
+                    className={`inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-all duration-200 ${recording
                         ? "bg-red-500 hover:bg-red-600"
                         : "bg-green-500 hover:bg-green-600"
-                    }`}
-                onClick={handleToggleRecording}
-            >
-                {recording
-                    ? `Stop Recording (${formatAudioTimestamp(duration)})`
-                    : "Start Recording"}
-            </button>
+                        }`}
+                    onClick={handleToggleRecording}
+                >
+                    {recording ? (
+                        <>
+                            <span className="mr-2">⬤</span>
+                            <span>{`Stop (${formatAudioTimestamp(duration)})`}</span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="mr-2">▶</span>
+                            <span>Record</span>
+                        </>
+                    )}
+                </button>
 
-            {recordedBlob && (
-                <audio className='w-full' ref={audioRef} controls>
-                    <source
-                        src={URL.createObjectURL(recordedBlob)}
-                        type={recordedBlob.type}
-                    />
-                </audio>
-            )}
+                {recordedBlob && (
+                    <button
+                        type='button'
+                        onClick={() => setRecordedBlob(null)}
+                        className="inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-all duration-200"
+                    >
+                        Clear
+                    </button>
+                )}
+            </div>
+
+            {/* {recordedBlob && (
+                <div className="mt-4 w-full max-w-md">
+                    <audio className='w-full' ref={audioRef} controls>
+                        <source
+                            src={URL.createObjectURL(recordedBlob)}
+                            type={recordedBlob.type}
+                        />
+                    </audio>
+                </div>
+            )} */}
         </div>
     );
 }
