@@ -159,10 +159,12 @@ export function AudioManager(props: { transcriber: Transcriber }) {
     const [audioDownloadUrl, setAudioDownloadUrl] = useState<
         string | undefined
     >(undefined);
+    const [hasRecorded, setHasRecorded] = useState<boolean>(false);
 
     const resetAudio = () => {
         setAudioData(undefined);
         setAudioDownloadUrl(undefined);
+        setHasRecorded(false);
     };
 
     const setAudioFromDownload = async (
@@ -187,6 +189,7 @@ export function AudioManager(props: { transcriber: Transcriber }) {
     const setAudioFromRecording = async (data: Blob) => {
         resetAudio();
         setProgress(0);
+        setHasRecorded(true);
         const blobUrl = URL.createObjectURL(data);
         const fileReader = new FileReader();
         fileReader.onprogress = (event) => {
@@ -253,13 +256,14 @@ export function AudioManager(props: { transcriber: Transcriber }) {
     return (
         <>
             <div className='flex flex-col justify-center items-center rounded-lg bg-white shadow-xl shadow-black/5 ring-1 ring-slate-700/10'>
-                <div className='flex flex-row space-x-2 py-2 w-full px-2'>
-                    <VerticalBar />
+                <div className='flex flex-row space-x-2 py-2 px-2'>
+                    {/* <VerticalBar />
                     <FileTile
                         icon={<FolderIcon />}
                         text={"From file"}
                         onFileUpdate={(decoded, blobUrl, mimeType) => {
                             props.transcriber.onInputChange();
+                            setHasRecorded(false);
                             setAudioData({
                                 buffer: decoded,
                                 url: blobUrl,
@@ -267,7 +271,7 @@ export function AudioManager(props: { transcriber: Transcriber }) {
                                 mimeType: mimeType,
                             });
                         }}
-                    />
+                    /> */}
                     {navigator.mediaDevices && (
                         <>
                             <VerticalBar />
@@ -282,8 +286,8 @@ export function AudioManager(props: { transcriber: Transcriber }) {
                                 }}
                                 isModelLoading={props.transcriber.isModelLoading}
                                 isTranscribing={props.transcriber.isBusy}
-                                disabled={!audioData}
-                                className={`${!audioData ? 'bg-red-500 hover:bg-red-600' : ''}`}
+                                disabled={!audioData || !hasRecorded}
+                                className={`${(!audioData || !hasRecorded) ? 'bg-red-500 hover:bg-red-600' : ''}`}
                             />
                         </>
                     )}
@@ -623,7 +627,7 @@ function Tile(props: {
             onClick={props.onClick}
             className='flex items-center justify-center rounded-lg p-2 bg-blue text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200'
         >
-            <div className='w-7 h-7'>{props.icon}</div>
+            <div className='w-4 h-4'>{props.icon}</div>
             {props.text && (
                 <div className='ml-2 break-text text-center text-md w-30'>
                     {props.text}
