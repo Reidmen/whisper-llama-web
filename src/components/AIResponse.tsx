@@ -1,5 +1,16 @@
 import { LlamaResponse, ChatMessage as ChatMessageLlama } from '../hooks/useLlama';
 
+function Spinner() {
+    return (
+        <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status">
+            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+            </span>
+        </div>
+    );
+}
+
 function ChatMessage({ message }: { message: ChatMessageLlama }) {
     return (
         <div className={`flex ${message.role === 'assistant' ? 'justify-start' : 'justify-end'} mb-4`}>
@@ -52,8 +63,9 @@ export default function AIResponse({ aiState }: { aiState: LlamaResponse }) {
             </div>
 
             {aiState.isLoading && !aiState.downloadProgress && (
-                <div className="animate-pulse-green bg-green-600 text-white rounded-lg p-4">
-                    Loading AI response...
+                <div className="flex items-center space-x-2 bg-green-50 text-green-700 rounded-lg p-4">
+                    <Spinner />
+                    <span>🦙 Generating response...</span>
                 </div>
             )}
 
