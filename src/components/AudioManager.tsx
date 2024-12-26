@@ -485,14 +485,24 @@ function SettingsModal(props: {
             }
             onClose={props.onClose}
             submitText={
-                <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                <div className="flex items-center justify-center w-full gap-2 group">
+                    <svg
+                        className="w-4 h-4 transition-colors duration-200 group-hover:text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                        />
                     </svg>
-                    Save Settings
+                    <span className="font-medium">Save Settings</span>
                 </div>
             }
-            submitClassName="bg-blue-600 hover:bg-blue-700 text-white"
+            submitClassName="w-full bg-blue-600 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-all duration-300 flex items-center justify-center active:bg-green-700 active:scale-95"
             onSubmit={() => props.onSubmit("")}
         />
     );
