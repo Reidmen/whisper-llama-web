@@ -548,18 +548,60 @@ function RecordModal(props: {
     return (
         <Modal
             show={props.show}
-            title={"Record audio"}
+            title={
+                <div className="flex items-center gap-3">
+                    <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <span className="text-xl font-semibold">Record Your Voice</span>
+                </div>
+            }
             content={
-                <AudioRecorder
-                    onRecordingProgress={(blob) => {
-                        props.onProgress(blob);
-                    }}
-                    onRecordingComplete={onRecordingComplete}
-                />
+                <div className="space-y-4">
+                    <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                        <div className="flex items-center gap-2 text-blue-700 mb-2">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="font-medium">Recording Tips:</span>
+                        </div>
+                        <ul className="text-sm text-blue-600 ml-7 list-disc space-y-1">
+                            <li>Speak clearly and at a normal pace</li>
+                            <li>Keep background noise to a minimum</li>
+                            <li>Stay close to your microphone</li>
+                        </ul>
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-4">
+                        <AudioRecorder
+                            onRecordingProgress={(blob) => {
+                                props.onProgress(blob);
+                            }}
+                            onRecordingComplete={onRecordingComplete}
+                        />
+                    </div>
+
+                    {audioBlob && (
+                        <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm font-medium">Recording ready to load</span>
+                        </div>
+                    )}
+                </div>
             }
             onClose={onClose}
-            submitText={"Load"}
+            submitText={
+                <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                    </svg>
+                    {audioBlob ? "Load Recording" : "Record First"}
+                </div>
+            }
             submitEnabled={audioBlob !== undefined}
+            submitClassName={`${audioBlob ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'} text-white px-4 py-2 rounded-lg transition-colors duration-200`}
             onSubmit={onSubmit}
         />
     );

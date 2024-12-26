@@ -5,10 +5,11 @@ export interface Props {
     show: boolean;
     onClose: () => void;
     onSubmit: () => void;
-    submitText?: string;
+    submitText?: React.ReactNode;
     submitEnabled?: boolean;
-    title: string | JSX.Element;
-    content: string | JSX.Element;
+    submitClassName?: string;
+    title: React.ReactNode;
+    content: React.ReactNode;
 }
 
 export default function Modal({
@@ -19,6 +20,7 @@ export default function Modal({
     content,
     submitText,
     submitEnabled = true,
+    submitClassName,
 }: Props) {
     return (
         <Transition appear show={show} as={Fragment}>
@@ -62,15 +64,15 @@ export default function Modal({
                                         <button
                                             type='button'
                                             disabled={!submitEnabled}
-                                            className={`inline-flex ml-4 justify-center rounded-md border border-transparent ${
-                                                submitEnabled
-                                                    ? "bg-indigo-600"
-                                                    : "bg-grey-300"
-                                            } px-4 py-2 text-sm font-medium text-indigo-100 ${
-                                                submitEnabled
-                                                    ? "hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                                            className={`inline-flex ml-4 justify-center rounded-md border border-transparent ${submitClassName ||
+                                                `${submitEnabled
+                                                    ? "bg-indigo-600 hover:bg-indigo-500"
+                                                    : "bg-gray-300"
+                                                } px-4 py-2 text-sm font-medium text-white ${submitEnabled
+                                                    ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                                                     : ""
-                                            } transition-all duration-300`}
+                                                }`
+                                                } transition-all duration-300`}
                                             onClick={onSubmit}
                                         >
                                             {submitText}
