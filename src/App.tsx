@@ -60,29 +60,69 @@ function App() {
             {showPermissionPrompt && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-lg max-w-md shadow-xl">
-                        <h2 className="text-xl font-bold mb-4">Download Permission Required</h2>
-                        <p className="mb-4">
-                            This application requires two AI models to function:
-                        </p>
-                        <ul className="list-disc pl-6 mb-4">
-                            <li>Llama 3.2 1B model (~1GB)</li>
-                            <li>Whisper Base model (~150MB)</li>
-                        </ul>
-                        <p className="mb-4">
-                            These models will be downloaded directly from HuggingFace's servers.
-                            No personal information is collected during this process.
-                        </p>
-                        <div className="flex justify-end gap-4">
+                        <div className="flex items-center gap-2 mb-6">
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h2 className="text-xl font-bold">Download Permission Required</h2>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <h3 className="font-semibold">Llama 3.2 1B</h3>
+                                </div>
+                                <p className="text-sm text-gray-600 ml-8">
+                                    • Text generation model (~1GB)<br />
+                                    • Powers the AI chat responses<br />
+                                    • Runs entirely in your browser
+                                </p>
+                            </div>
+
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                    <h3 className="font-semibold">Whisper Base</h3>
+                                </div>
+                                <p className="text-sm text-gray-600 ml-8">
+                                    • Speech recognition model (~150MB)<br />
+                                    • Converts your voice to text<br />
+                                    • Local processing for privacy
+                                </p>
+                            </div>
+
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <p className="text-sm text-blue-800">
+                                        Downloads directly from HuggingFace.<br />
+                                        No personal data collection.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-4 mt-6">
                             <button
                                 onClick={() => setShowPermissionPrompt(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleAcceptDownload}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
                             >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
                                 Accept & Download
                             </button>
                         </div>
