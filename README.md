@@ -102,7 +102,7 @@ MIT License - see the [LICENSE](LICENSE) file for details
 
 - [Xenova](https://github.com/xenova) for the original template
 - [Whisper](https://github.com/openai/whisper) by OpenAI
-- [Llama](https://ai.meta.com/llama/) by Meta AI
+- [Llama](https://www.llama.com/) by Meta AI
 
 ---
 
