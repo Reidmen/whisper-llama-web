@@ -156,26 +156,75 @@ function App() {
                     </div>
                 </div>
             )}
-            <div className='flex justify-center items-center min-h-screen'>
-                <div className='container flex flex-col justify-between min-h-screen'>
-                    <div className='flex-1 overflow-y-auto'>
-                        <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl text-center mt-4 sticky top-0 bg-white'>
-                            Whisper WebGPU + Llama 3.2 🦙 (Fully Secret)
-                        </h3>
-                        <div className='overflow-y-auto h-[calc(100vh-200px)]'>
+            <div className='flex justify-center items-center min-h-screen bg-gray-50'>
+                <div className='container max-w-4xl mx-auto flex flex-col justify-between min-h-screen p-4'>
+                    <div className='flex-1 overflow-y-auto bg-white rounded-lg shadow-lg'>
+                        <div className='sticky top-0 z-10 bg-white border-b border-gray-100 rounded-t-lg'>
+                            <h3 className='text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl p-4 flex items-center justify-center gap-2'>
+                                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                                Whisper WebGPU + Llama 3.2
+                                <span className="text-2xl">🦙</span>
+                                <span className="ml-2 text-sm font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">Fully Local</span>
+                            </h3>
+                        </div>
+
+                        <div className='overflow-y-auto h-[calc(100vh-280px)] px-4'>
                             <AIResponse aiState={llama} />
-                            <div ref={messagesEndRef} /> {/* Scroll anchor */}
+                            <div ref={messagesEndRef} />
                         </div>
                     </div>
-                    <div className='sticky bottom-0 bg-white pb-4'>
-                        <AudioManager transcriber={transcriber} />
-                        <Transcript transcribedData={transcriber.output} />
-                        <p className='text-center text-sm text-gray-500 mt-4 hover:text-blue-600 transition-colors duration-300'>
-                            Created by 🔮 <a href="https://github.com/Reidmen" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-blue-800">Reidmen</a> 🚀, Template and inspiration by <a href="https://github.com/xenova" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">Xenova</a>
-                        </p>
+
+                    <div className='sticky bottom-0 mt-4'>
+                        <div className='bg-white rounded-lg shadow-lg p-4'>
+                            <AudioManager transcriber={transcriber} />
+                            <Transcript transcribedData={transcriber.output} />
+
+                            <div className='mt-4 pt-4 border-t border-gray-100'>
+                                <p className='text-center text-sm text-gray-500 flex items-center justify-center gap-2'>
+                                    <span>Created by</span>
+                                    <a
+                                        href="https://github.com/Reidmen"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300"
+                                    >
+                                        🔮 Reidmen
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
+                                    <span>•</span>
+                                    <span>Template by</span>
+                                    <a
+                                        href="https://github.com/xenova"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300"
+                                    >
+                                        Xenova
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* WebGPU not supported message */}
+            ) : (
+            <div className='fixed w-screen h-screen bg-gradient-to-b from-gray-900 to-black z-10 text-white flex flex-col justify-center items-center text-center p-4'>
+                <svg className="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h2 className='text-3xl font-bold mb-2'>WebGPU Not Supported</h2>
+                <p className='text-gray-400'>Please try using a WebGPU-compatible browser</p>
+            </div>
+            )
         </>
     ) : (
         <div className='fixed w-screen h-screen bg-black z-10 bg-opacity-[92%] text-white text-2xl font-semibold flex justify-center items-center text-center'>
