@@ -1,23 +1,25 @@
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     isModelLoading: boolean;
     isTranscribing: boolean;
+    disabled?: boolean;
+    className?: string;
 }
 
 export function TranscribeButton(props: Props): JSX.Element {
-    const { isModelLoading, isTranscribing, onClick, ...buttonProps } = props;
+    const { isModelLoading, isTranscribing, onClick, disabled, className, ...buttonProps } = props;
     return (
         <button
             {...buttonProps}
             onClick={(event) => {
-                if (onClick && !isTranscribing && !isModelLoading) {
+                if (onClick && !isTranscribing && !isModelLoading && !disabled) {
                     onClick(event);
                 }
             }}
-            disabled={isTranscribing}
+            disabled={isTranscribing || disabled}
             className={`text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 inline-flex items-center
                 ${isModelLoading || isTranscribing
                     ? 'animate-pulse-green bg-green-600'
-                    : 'bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                    : className || 'bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
                 }`}
         >
             {isModelLoading ? (

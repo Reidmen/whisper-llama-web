@@ -274,34 +274,27 @@ export function AudioManager(props: { transcriber: Transcriber }) {
                             <RecordTile
                                 icon={<MicrophoneIcon />}
                                 text={"Record"}
-                                setAudioData={(e) => {
-                                    props.transcriber.onInputChange();
-                                    setAudioFromRecording(e);
+                                setAudioData={setAudioFromRecording}
+                            />
+                            <TranscribeButton
+                                onClick={() => {
+                                    audioData && props.transcriber.start(audioData.buffer);
                                 }}
+                                isModelLoading={props.transcriber.isModelLoading}
+                                isTranscribing={props.transcriber.isBusy}
+                                disabled={!audioData}
+                                className={`${!audioData ? 'bg-red-500 hover:bg-red-600' : ''}`}
                             />
                         </>
                     )}
                 </div>
                 <AudioDataBar
-                    progress={
-                        progress !== undefined && audioData
-                            ? 1
-                            : (progress ?? 0)
-                    }
+                    progress={progress !== undefined && audioData ? 1 : (progress ?? 0)}
                 />
             </div>
 
             {audioData && (
                 <>
-                    <div className='relative w-full flex justify-center items-center'>
-                        <TranscribeButton
-                            onClick={() => {
-                                props.transcriber.start(audioData.buffer);
-                            }}
-                            isModelLoading={props.transcriber.isModelLoading}
-                            isTranscribing={props.transcriber.isBusy}
-                        />
-                    </div>
                     {props.transcriber.progressItems.length > 0 && (
                         <div className='relative z-10 p-4 w-full text-center'>
                             <label>
