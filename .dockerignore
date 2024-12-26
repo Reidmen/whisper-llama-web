@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Source control
+.git
+.github
+.gitignore
+
+# Environment and IDE
+.env*
+.vscode
+.idea
+
+# Build outputs
+.next
+out
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System files
+.DS_Store 
