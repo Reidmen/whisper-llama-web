@@ -7,71 +7,105 @@ sdk: docker
 pinned: false
 app_port: 7860
 ---
+<div align="center">
+# 🎙️ Whisper Web + Llama 3.2 🦙
 
-# Whisper Web + Llama 3.2
+<p align="center">
+  <strong>ML-powered speech recognition and AI chat, right in your browser</strong>
+</p>
 
-ML-powered speech recognition and AI responses in your browser!
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#models">Models</a> •
+  <a href="#development">Development</a> •
+  <a href="#tech-stack">Tech Stack</a>
+</p>
 
-## Features
-- 🎤 Real-time speech recognition using Whisper
-- 🦙 Chat interactions using Llama 3.2
-- ⚡ WebGPU acceleration for optimal performance
-- 🌐 Runs entirely in the browser - no server required
-- 🔊 Support for multiple audio input formats
-- 🌍 Multilingual support
+[Report Bug](https://github.com/Reidmen/whisper-llama-web/issues) | [Request Feature](https://github.com/Reidmen/whisper-llama-web/issues)
 
-### Speech Recognition (Whisper)
-- Tiny (120MB)
-- Base (206MB)
-- Small (586MB)
-- Large V3 Turbo (1.6GB)
-- Distil Small English-only (538MB)
+</div>
 
-### Text Generation (Llama)
-- Llama 3.2 1B Instruct (Quantized)
+---
 
-## Running locally
+## ✨ Features
 
-1. Clone the repo and install dependencies:
+- 🎤 **Real-time Processing** - Instant speech recognition with Whisper and AI responses with Llama 3.2 1B Instruct
+- 🌐 **100% Client-side** - No server needed, everything runs in your browser
+- ⚡ **WebGPU Powered** - Hardware-accelerated for optimal performance
+- 🔒 **Privacy First** - All processing happens locally
+- 🌍 **Multilingual** - Supports multiple languages
 
-    ```bash
-    git clone https://github.com/xenova/whisper-web.git
-    cd whisper-web
-    pnpm install
-    ```
+## 🚀 Quick Start
 
-2. Run the development server:
+```bash
+# Clone the repository
+git clone https://github.com/Reidmen/whisper-llama-web.git
 
-    ```bash
-    pnpm run dev
-    ```
+# Install dependencies
+pnpm install
 
-3. Open the link (e.g., [http://localhost:5173/](http://localhost:5173/)) in your browser.
+# Start the development server
+pnpm run dev
+```
 
-## Requirements
+Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
-- A modern browser with WebGPU support
-- Sufficient GPU memory for model loading
-- Microphone access (for recording feature)
+## 🤖 Models
 
-## Technical Overview
+### Speech Recognition
+| Model | Size | Languages | Performance |
+|-------|------|-----------|-------------|
+| Tiny | 120MB | All | Fast |
+| Base | 206MB | All | Balanced |
+| Small | 586MB | All | Accurate |
+| Large V3 | 1.6GB | All | Most Accurate |
+| Distil Small | 538MB | English | Optimized |
 
-The application is built using:
-- React for the UI
-- Transformers.js for ML model inference
-- Web Workers for background processing
-- WebGPU for hardware acceleration
-- Tailwind CSS for styling
+### Chat Model
+- **Llama 3.2 1B Instruct** (Quantized for browser)
+  - Fast local inference
+  - ~1GB memory usage
+  - Multi-turn conversations
 
-The architecture consists of:
-- Speech recognition pipeline using Whisper models
-- Text generation pipeline using Llama 3.2
-- Real-time audio processing and transcription
-- Streaming response generation
+## 💻 Development
 
-## Build and run with Docker
+### Prerequisites
+- Modern browser with WebGPU support
+- GPU with sufficient memory
+- Microphone access (for recording)
 
+### Local Setup
+1. Clone and install dependencies
+2. Configure environment variables (if needed)
+3. Start development server
+4. Open browser at localhost:5173
+
+### Docker Deployment
 ```bash
 docker build -t whisper-web .
 docker run -p 7860:7860 whisper-web
 ```
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, TailwindCSS
+- **ML Framework:** Transformers.js
+- **Performance:** WebGPU, Web Workers
+- **Build Tools:** Vite, TypeScript
+
+## 📄 License
+
+MIT License - see the [LICENSE](LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+- [Xenova](https://github.com/xenova) for the original template
+- [Whisper](https://github.com/openai/whisper) by OpenAI
+- [Llama](https://ai.meta.com/llama/) by Meta AI
+
+---
+
+<div align="center">
+  <sub>Built by Reidmen, inspired by the transformers.js</sub>
+</div>
