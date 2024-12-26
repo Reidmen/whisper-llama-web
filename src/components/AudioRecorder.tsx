@@ -31,8 +31,6 @@ export default function AudioRecorder(props: {
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
 
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
     const startRecording = async () => {
         // Reset recording (if any)
         setRecordedBlob(null);
