@@ -9,9 +9,9 @@ import AudioRecorder from "./AudioRecorder";
 import { env } from '@huggingface/transformers';
 
 // Configure caching settings at the top of the file
-env.useBrowserCache = false; // Enable browser caching
+env.useBrowserCache = true; // Enable browser caching
 env.cacheDir = './.cache'; // Set cache directory (optional)
-env.allowLocalModels = false; // Allow loading cached models
+env.allowLocalModels = true; // Allow loading cached models
 
 function titleCase(str: string) {
     str = str.toLowerCase();
