@@ -361,18 +361,66 @@ function SettingsTile(props: {
     transcriber: Transcriber;
 }) {
     const [showModal, setShowModal] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className={props.className}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className={`
+                    relative group flex items-center justify-center
+                    p-3 rounded-full 
+                    bg-white shadow-lg hover:shadow-xl
+                    border border-gray-100
+                    transition-all duration-300
+                    hover:bg-indigo-50 active:scale-95
+                    ${props.className || ''}
+                `}
                 data-settings-tile
             >
-                <div className="w-6 h-6 text-slate-600 hover:text-indigo-600 transition-colors duration-200">
-                    {props.icon}
+                {/* Ripple effect on hover */}
+                <div className={`
+                    absolute inset-0 rounded-full
+                    bg-indigo-100 opacity-0 scale-90
+                    transition-all duration-300 ease-out
+                    ${isHovered ? 'opacity-50 scale-105' : ''}
+                `} />
+
+                {/* Icon container */}
+                <div className="relative flex items-center gap-2">
+                    <div className="w-6 h-6 text-slate-600 group-hover:text-indigo-600 transition-colors duration-200">
+                        {props.icon}
+                    </div>
+
+                    {/* Tooltip */}
+                    <div className={`
+                        absolute right-full mr-3 whitespace-nowrap
+                        px-2 py-1 rounded-lg text-xs font-medium
+                        bg-gray-800 text-white
+                        opacity-0 -translate-x-2
+                        transition-all duration-200
+                        ${isHovered ? 'opacity-100 translate-x-0' : ''}
+                    `}>
+                        Configure Settings
+                        {/* Tooltip arrow */}
+                        <div className="absolute top-1/2 right-0 -mt-1
+                                      border-4 border-transparent 
+                                      border-l-gray-800" />
+                    </div>
                 </div>
+
+                {/* Status indicator */}
+                {props.transcriber.multilingual && (
+                    <div className="absolute -top-1 -right-1 
+                                  w-3 h-3 rounded-full
+                                  bg-indigo-500 border-2 border-white
+                                  transition-transform duration-200
+                                  group-hover:scale-125" />
+                )}
             </button>
+
             <SettingsModal
                 show={showModal}
                 onSubmit={() => setShowModal(false)}
