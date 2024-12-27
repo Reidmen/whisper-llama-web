@@ -255,73 +255,98 @@ export function AudioManager(props: { transcriber: Transcriber }) {
 
     return (
         <>
-            <div className='flex flex-col justify-center items-center rounded-lg bg-white shadow-xl shadow-black/5 ring-1 ring-slate-700/10'>
-                <div className='flex flex-row space-x-2 py-2 px-2'>
-                    {/* <VerticalBar />
-                    <FileTile
-                        icon={<FolderIcon />}
-                        text={"From file"}
-                        onFileUpdate={(decoded, blobUrl, mimeType) => {
-                            props.transcriber.onInputChange();
-                            setHasRecorded(false);
-                            setAudioData({
-                                buffer: decoded,
-                                url: blobUrl,
-                                source: AudioSource.FILE,
-                                mimeType: mimeType,
-                            });
-                        }}
-                    /> */}
-                    {navigator.mediaDevices && (
-                        <>
-                            <VerticalBar />
-                            <RecordTile
-                                icon={<MicrophoneIcon />}
-                                text={"Record"}
-                                setAudioData={setAudioFromRecording}
-                            />
-                            <TranscribeButton
-                                onClick={() => {
-                                    audioData && props.transcriber.start(audioData.buffer);
-                                }}
-                                isModelLoading={props.transcriber.isModelLoading}
-                                isTranscribing={props.transcriber.isBusy}
-                                disabled={!audioData || !hasRecorded}
-                                className={`${(!audioData || !hasRecorded) ? 'bg-red-500 hover:bg-red-600' : ''}`}
-                            />
-                        </>
-                    )}
-                </div>
-                <AudioDataBar
-                    progress={progress !== undefined && audioData ? 1 : (progress ?? 0)}
-                />
-            </div>
+            <div className='flex flex-col gap-4 w-full max-w-2xl mx-auto'>
+                {/* Main Control Panel */}
+                <div className='relative overflow-hidden rounded-xl bg-white shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl'>
+                    {/* Recording Controls */}
+                    <div className='flex items-center justify-center p-4 gap-4'>
+                        {navigator.mediaDevices && (
+                            <>
+                                <RecordTile
+                                    icon={<MicrophoneIcon />}
+                                    text="Record"
+                                    setAudioData={setAudioFromRecording}
+                                />
+                                <TranscribeButton
+                                    onClick={() => audioData && props.transcriber.start(audioData.buffer)}
+                                    isModelLoading={props.transcriber.isModelLoading}
+                                    isTranscribing={props.transcriber.isBusy}
+                                    disabled={!audioData || !hasRecorded}
+                                    className={`
+                                        flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300
+                                        ${(!audioData || !hasRecorded)
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg active:scale-95'
+                                        }
+                                    `}
+                                />
+                            </>
+                        )}
+                    </div>
 
-            {audioData && (
-                <>
-                    {props.transcriber.progressItems.length > 0 && (
-                        <div className='relative z-10 p-4 w-full text-center'>
-                            <label>
-                                Loading model files... (only run once)
-                            </label>
-                            {props.transcriber.progressItems.map((data) => (
-                                <div key={data.file}>
-                                    <Progress
-                                        text={data.file}
-                                        percentage={data.progress}
-                                    />
-                                </div>
-                            ))}
+                    {/* Progress Bar */}
+                    <div className='px-4 pb-4'>
+                        <div className='relative h-2 bg-gray-100 rounded-full overflow-hidden'>
+                            <div
+                                className={`
+                                    absolute h-full left-0 top-0 rounded-full
+                                    ${audioData ? 'bg-green-500' : 'bg-indigo-500'}
+                                    transition-all duration-300 ease-out
+                                `}
+                                style={{
+                                    width: `${Math.round((progress !== undefined && audioData ? 1 : (progress ?? 0)) * 100)}%`,
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Status Indicator */}
+                    {(audioData || progress !== undefined) && (
+                        <div className='absolute top-2 right-2'>
+                            <span className={`
+                                inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                ${audioData
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-indigo-100 text-indigo-800'
+                                }
+                            `}>
+                                {audioData ? 'Ready' : 'Processing...'}
+                            </span>
                         </div>
                     )}
-                </>
-            )}
+                </div>
 
-            <SettingsTile
-                className='absolute bottom-4 right-4'
-                transcriber={props.transcriber}
-                icon={<SettingsIcon />}
-            />
+                {/* Model Loading Progress */}
+                {audioData && props.transcriber.progressItems.length > 0 && (
+                    <div className='bg-white rounded-xl p-6 shadow-lg border border-gray-100'>
+                        <div className='flex items-center gap-2 mb-4 text-indigo-600'>
+                            <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            <span className='font-medium'>Loading model files...</span>
+                            <span className='text-sm text-gray-500'>(one-time process)</span>
+                        </div>
+
+                        <div className='space-y-3'>
+                            {props.transcriber.progressItems.map((data) => (
+                                <Progress
+                                    key={data.file}
+                                    text={data.file}
+                                    percentage={data.progress}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Settings Button */}
+                <SettingsTile
+                    className='fixed bottom-6 right-6 shadow-lg hover:shadow-xl transition-shadow duration-300'
+                    transcriber={props.transcriber}
+                    icon={<SettingsIcon />}
+                />
+            </div>
         </>
     );
 }
