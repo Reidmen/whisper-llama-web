@@ -341,11 +341,21 @@ export function AudioManager(props: { transcriber: Transcriber }) {
                 )}
 
                 {/* Settings Button */}
-                <SettingsTile
-                    className='fixed bottom-6 right-6 shadow-lg hover:shadow-xl transition-shadow duration-300'
-                    transcriber={props.transcriber}
-                    icon={<SettingsIcon />}
-                />
+                <div className='fixed bottom-6 right-6'>
+                    <button
+                        className="group p-3 bg-white rounded-full shadow-lg hover:shadow-xl 
+                                 border border-gray-100 transition-all duration-300
+                                 hover:bg-indigo-50 active:scale-95"
+                        onClick={() => {
+                            const settingsTile = document.querySelector('[data-settings-tile]') as HTMLElement;
+                            settingsTile?.click();
+                        }}
+                    >
+                        <div className="w-6 h-6 text-slate-600 hover:text-indigo-600 transition-colors duration-200">
+                            <SettingsIcon />
+                        </div>
+                    </button>
+                </div>
             </div>
         </>
     );
@@ -559,29 +569,32 @@ function RecordTile(props: {
 }) {
     const [showModal, setShowModal] = useState(false);
 
-    const onClick = () => {
-        setShowModal(true);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
-
-    const onSubmit = (data: Blob | undefined) => {
-        if (data) {
-            props.setAudioData(data);
-            onClose();
-        }
-    };
-
     return (
         <>
-            <Tile icon={props.icon} text={props.text} onClick={onClick} />
+            <button
+                onClick={() => setShowModal(true)}
+                className="group flex items-center gap-2 py-3 px-4 bg-white rounded-lg
+                         text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 
+                         shadow-sm hover:shadow border border-gray-100
+                         transition-all duration-200 active:scale-95"
+            >
+                <div className="w-5 h-5">
+                    {props.icon}
+                </div>
+                <span className="font-medium text-sm">
+                    {props.text}
+                </span>
+            </button>
             <RecordModal
                 show={showModal}
-                onSubmit={onSubmit}
-                onProgress={(_data) => { }}
-                onClose={onClose}
+                onSubmit={(data) => {
+                    if (data) {
+                        props.setAudioData(data);
+                        setShowModal(false);
+                    }
+                }}
+                onProgress={() => { }}
+                onClose={() => setShowModal(false)}
             />
         </>
     );
