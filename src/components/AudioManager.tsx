@@ -255,73 +255,102 @@ export function AudioManager(props: { transcriber: Transcriber }) {
 
     return (
         <>
-            <div className='flex flex-col justify-center items-center rounded-lg bg-white shadow-xl shadow-black/5 ring-1 ring-slate-700/10'>
-                <div className='flex flex-row space-x-2 py-2 px-2'>
-                    {/* <VerticalBar />
-                    <FileTile
-                        icon={<FolderIcon />}
-                        text={"From file"}
-                        onFileUpdate={(decoded, blobUrl, mimeType) => {
-                            props.transcriber.onInputChange();
-                            setHasRecorded(false);
-                            setAudioData({
-                                buffer: decoded,
-                                url: blobUrl,
-                                source: AudioSource.FILE,
-                                mimeType: mimeType,
-                            });
-                        }}
-                    /> */}
-                    {navigator.mediaDevices && (
-                        <>
-                            <VerticalBar />
-                            <RecordTile
-                                icon={<MicrophoneIcon />}
-                                text={"Record"}
-                                setAudioData={setAudioFromRecording}
-                            />
-                            <TranscribeButton
-                                onClick={() => {
-                                    audioData && props.transcriber.start(audioData.buffer);
-                                }}
-                                isModelLoading={props.transcriber.isModelLoading}
-                                isTranscribing={props.transcriber.isBusy}
-                                disabled={!audioData || !hasRecorded}
-                                className={`${(!audioData || !hasRecorded) ? 'bg-red-500 hover:bg-red-600' : ''}`}
-                            />
-                        </>
-                    )}
-                </div>
-                <AudioDataBar
-                    progress={progress !== undefined && audioData ? 1 : (progress ?? 0)}
-                />
-            </div>
+            <div className='flex flex-col gap-4 w-full max-w-2xl mx-auto'>
+                {/* Main Control Panel */}
+                <div className='relative overflow-hidden rounded-xl bg-white shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl'>
+                    {/* Recording Controls */}
+                    <div className='flex items-center justify-center p-4 gap-4'>
+                        {navigator.mediaDevices && (
+                            <>
+                                <RecordTile
+                                    icon={<MicrophoneIcon />}
+                                    text="Record"
+                                    setAudioData={setAudioFromRecording}
+                                />
+                                <TranscribeButton
+                                    onClick={() => audioData && props.transcriber.start(audioData.buffer)}
+                                    isModelLoading={props.transcriber.isModelLoading}
+                                    isTranscribing={props.transcriber.isBusy}
+                                    disabled={!audioData || !hasRecorded}
+                                    className={`
+                                        flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300
+                                        ${(!audioData || !hasRecorded)
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg active:scale-95'
+                                        }
+                                    `}
+                                />
+                            </>
+                        )}
+                    </div>
 
-            {audioData && (
-                <>
-                    {props.transcriber.progressItems.length > 0 && (
-                        <div className='relative z-10 p-4 w-full text-center'>
-                            <label>
-                                Loading model files... (only run once)
-                            </label>
-                            {props.transcriber.progressItems.map((data) => (
-                                <div key={data.file}>
-                                    <Progress
-                                        text={data.file}
-                                        percentage={data.progress}
-                                    />
-                                </div>
-                            ))}
+                    {/* Progress Bar */}
+                    <div className='px-4 pb-4'>
+                        <div className='relative h-2 bg-gray-100 rounded-full overflow-hidden'>
+                            <div
+                                className={`
+                                    absolute h-full left-0 top-0 rounded-full
+                                    ${audioData ? 'bg-green-500' : 'bg-indigo-500'}
+                                    transition-all duration-300 ease-out
+                                `}
+                                style={{
+                                    width: `${Math.round((progress !== undefined && audioData ? 1 : (progress ?? 0)) * 100)}%`,
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Status Indicator */}
+                    {(audioData || progress !== undefined) && (
+                        <div className='absolute top-2 right-2'>
+                            <span className={`
+                                inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                ${audioData
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-indigo-100 text-indigo-800'
+                                }
+                            `}>
+                                {audioData ? 'Ready' : 'Processing...'}
+                            </span>
                         </div>
                     )}
-                </>
-            )}
+                </div>
 
-            <SettingsTile
-                className='absolute bottom-4 right-4'
-                transcriber={props.transcriber}
-                icon={<SettingsIcon />}
-            />
+                {/* Model Loading Progress */}
+                {audioData && props.transcriber.progressItems.length > 0 && (
+                    <div className='bg-white rounded-xl p-6 shadow-lg border border-gray-100'>
+                        <div className='flex items-center gap-2 mb-4 text-indigo-600'>
+                            <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            <span className='font-medium'>Loading model files...</span>
+                            <span className='text-sm text-gray-500'>(one-time process)</span>
+                        </div>
+
+                        <div className='space-y-3'>
+                            {props.transcriber.progressItems.map((data) => (
+                                <Progress
+                                    key={data.file}
+                                    text={data.file}
+                                    percentage={data.progress}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Settings Button */}
+                <div className='fixed bottom-6 right-6'>
+                    <SettingsTile
+                        icon={<SettingsIcon />}
+                        transcriber={props.transcriber}
+                        className="group p-3 bg-white rounded-full shadow-lg hover:shadow-xl 
+                                 border border-gray-100 transition-all duration-300
+                                 hover:bg-indigo-50 active:scale-95"
+                    />
+                </div>
+            </div>
         </>
     );
 }
@@ -332,29 +361,73 @@ function SettingsTile(props: {
     transcriber: Transcriber;
 }) {
     const [showModal, setShowModal] = useState(false);
-
-    const onClick = () => {
-        setShowModal(true);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
-
-    const onSubmit = () => {
-        onClose();
-    };
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <div className={props.className}>
-            <Tile icon={props.icon} onClick={onClick} />
+        <>
+            <button
+                onClick={() => setShowModal(true)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className={`
+                    relative group flex items-center justify-center
+                    p-3 rounded-full 
+                    bg-white shadow-lg hover:shadow-xl
+                    border border-gray-100
+                    transition-all duration-300
+                    hover:bg-indigo-50 active:scale-95
+                    ${props.className || ''}
+                `}
+                data-settings-tile
+            >
+                {/* Ripple effect on hover */}
+                <div className={`
+                    absolute inset-0 rounded-full
+                    bg-indigo-100 opacity-0 scale-90
+                    transition-all duration-300 ease-out
+                    ${isHovered ? 'opacity-50 scale-105' : ''}
+                `} />
+
+                {/* Icon container */}
+                <div className="relative flex items-center gap-2">
+                    <div className="w-6 h-6 text-slate-600 group-hover:text-indigo-600 transition-colors duration-200">
+                        {props.icon}
+                    </div>
+
+                    {/* Tooltip */}
+                    <div className={`
+                        absolute right-full mr-3 whitespace-nowrap
+                        px-2 py-1 rounded-lg text-xs font-medium
+                        bg-gray-800 text-white
+                        opacity-0 -translate-x-2
+                        transition-all duration-200
+                        ${isHovered ? 'opacity-100 translate-x-0' : ''}
+                    `}>
+                        Configure Settings
+                        {/* Tooltip arrow */}
+                        <div className="absolute top-1/2 right-0 -mt-1
+                                      border-4 border-transparent 
+                                      border-l-gray-800" />
+                    </div>
+                </div>
+
+                {/* Status indicator */}
+                {props.transcriber.multilingual && (
+                    <div className="absolute -top-1 -right-1 
+                                  w-3 h-3 rounded-full
+                                  bg-indigo-500 border-2 border-white
+                                  transition-transform duration-200
+                                  group-hover:scale-125" />
+                )}
+            </button>
+
             <SettingsModal
                 show={showModal}
-                onSubmit={onSubmit}
-                onClose={onClose}
+                onSubmit={() => setShowModal(false)}
+                onClose={() => setShowModal(false)}
                 transcriber={props.transcriber}
             />
-        </div>
+        </>
     );
 }
 
@@ -534,29 +607,32 @@ function RecordTile(props: {
 }) {
     const [showModal, setShowModal] = useState(false);
 
-    const onClick = () => {
-        setShowModal(true);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
-
-    const onSubmit = (data: Blob | undefined) => {
-        if (data) {
-            props.setAudioData(data);
-            onClose();
-        }
-    };
-
     return (
         <>
-            <Tile icon={props.icon} text={props.text} onClick={onClick} />
+            <button
+                onClick={() => setShowModal(true)}
+                className="group flex items-center gap-2 py-3 px-4 bg-white rounded-lg
+                         text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 
+                         shadow-sm hover:shadow border border-gray-100
+                         transition-all duration-200 active:scale-95"
+            >
+                <div className="w-5 h-5">
+                    {props.icon}
+                </div>
+                <span className="font-medium text-sm">
+                    {props.text}
+                </span>
+            </button>
             <RecordModal
                 show={showModal}
-                onSubmit={onSubmit}
-                onProgress={(_data) => { }}
-                onClose={onClose}
+                onSubmit={(data) => {
+                    if (data) {
+                        props.setAudioData(data);
+                        setShowModal(false);
+                    }
+                }}
+                onProgress={() => { }}
+                onClose={() => setShowModal(false)}
             />
         </>
     );
@@ -588,59 +664,88 @@ function RecordModal(props: {
         <Modal
             show={props.show}
             title={
-                <div className="flex items-center gap-3">
-                    <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                    <span className="text-xl font-semibold">Record Your Voice</span>
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="relative">
+                        <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <span className="text-xl font-semibold">Voice Recorder</span>
                 </div>
             }
             content={
-                <div className="space-y-4">
-                    <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center gap-2 text-blue-700 mb-2">
+                <div className="space-y-6">
+                    {/* Tips Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
+                        <div className="flex items-center gap-2 text-indigo-700 mb-3">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span className="font-medium">Recording Tips:</span>
+                            <span className="font-medium">Quick Tips</span>
                         </div>
-                        <ul className="text-sm text-blue-600 ml-7 list-disc space-y-1">
-                            <li>Speak clearly and at a normal pace</li>
-                            <li>Keep background noise to a minimum</li>
-                            <li>Stay close to your microphone</li>
+                        <ul className="text-sm text-indigo-600 ml-7 list-disc space-y-1.5">
+                            <li className="transition-all duration-200 hover:translate-x-1">Speak clearly at a normal pace</li>
+                            <li className="transition-all duration-200 hover:translate-x-1">Minimize background noise</li>
+                            <li className="transition-all duration-200 hover:translate-x-1">Keep microphone close</li>
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-lg border border-gray-200 p-4">
-                        <AudioRecorder
-                            onRecordingProgress={(blob) => {
-                                props.onProgress(blob);
-                            }}
-                            onRecordingComplete={onRecordingComplete}
-                        />
+                    {/* Recorder Card */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div className="flex flex-col items-center">
+                            <AudioRecorder
+                                onRecordingProgress={(blob) => props.onProgress(blob)}
+                                onRecordingComplete={onRecordingComplete}
+                            />
+                        </div>
                     </div>
 
+                    {/* Status Indicator */}
                     {audioBlob && (
-                        <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-sm font-medium">Recording ready to load</span>
+                        <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"></div>
+                                </div>
+                                <span className="text-sm font-medium text-green-700">Recording ready!</span>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="text-xs text-green-600 hover:text-green-700 underline underline-offset-2"
+                            >
+                                Record again
+                            </button>
                         </div>
                     )}
                 </div>
             }
             onClose={onClose}
             submitText={
-                <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-                    </svg>
-                    {audioBlob ? "Load Recording" : "Record First"}
+                <div className="flex items-center justify-center w-full gap-2 group">
+                    {audioBlob ? (
+                        <>
+                            <svg className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                            </svg>
+                            <span className="font-medium">Load Recording</span>
+                        </>
+                    ) : (
+                        <span className="font-medium">Start Recording</span>
+                    )}
                 </div>
             }
             submitEnabled={audioBlob !== undefined}
-            submitClassName={`${audioBlob ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'} text-white px-4 py-2 rounded-lg transition-colors duration-200`}
+            submitClassName={`
+                w-full px-6 py-3 rounded-xl transition-all duration-300 
+                ${audioBlob
+                    ? 'bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white shadow-md hover:shadow-lg active:scale-98'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }
+            `}
             onSubmit={onSubmit}
         />
     );
@@ -654,11 +759,16 @@ function Tile(props: {
     return (
         <button
             onClick={props.onClick}
-            className='flex items-center justify-center rounded-lg p-2 bg-blue text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200'
+            className='group flex items-center justify-center rounded-xl p-3 bg-white text-slate-600 
+                     hover:text-indigo-600 hover:bg-indigo-50 active:scale-95
+                     shadow-sm hover:shadow border border-gray-100
+                     transition-all duration-200'
         >
-            <div className='w-4 h-4'>{props.icon}</div>
+            <div className='w-5 h-5 transition-transform duration-200 group-hover:scale-110'>
+                {props.icon}
+            </div>
             {props.text && (
-                <div className='ml-2 break-text text-center text-md w-30'>
+                <div className='ml-2 font-medium text-sm'>
                     {props.text}
                 </div>
             )}
@@ -670,21 +780,28 @@ function Tile(props: {
 function SettingsIcon() {
     return (
         <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth='1.25'
-            stroke='currentColor'
+            className="w-full h-full transition-colors duration-200"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
         >
+            <g className="opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <circle cx="12" cy="12" r="10" className="animate-pulse" fill="currentColor" fillOpacity="0.1" />
+            </g>
             <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z'
+                className="transition-transform duration-300 origin-center hover:rotate-90"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                d="M12 15a3 3 0 100-6 3 3 0 000 6z"
             />
             <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
             />
         </svg>
     );
@@ -693,16 +810,51 @@ function SettingsIcon() {
 function MicrophoneIcon() {
     return (
         <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth={1.5}
-            stroke='currentColor'
+            className="w-full h-full transition-colors duration-200"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
         >
+            {/* Pulse effect circle */}
+            <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    className="animate-pulse"
+                    fill="currentColor"
+                    fillOpacity="0.1"
+                />
+            </g>
+
+            {/* Microphone body */}
             <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z'
+                className="transition-all duration-300 origin-center group-hover:scale-105"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                d="M12 15.75a4 4 0 004-4V6a4 4 0 00-8 0v5.75a4 4 0 004 4z"
+            />
+
+            {/* Sound waves */}
+            <path
+                className="transition-opacity duration-300 group-hover:opacity-100 opacity-70"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                d="M8 9.75v2a4 4 0 008 0v-2"
+            />
+
+            {/* Stand */}
+            <path
+                className="transition-all duration-300 origin-bottom group-hover:scale-y-110"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                d="M12 15.75V19m-4 2h8"
             />
         </svg>
     );
