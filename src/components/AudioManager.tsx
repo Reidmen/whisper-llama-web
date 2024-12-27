@@ -342,19 +342,13 @@ export function AudioManager(props: { transcriber: Transcriber }) {
 
                 {/* Settings Button */}
                 <div className='fixed bottom-6 right-6'>
-                    <button
+                    <SettingsTile
+                        icon={<SettingsIcon />}
+                        transcriber={props.transcriber}
                         className="group p-3 bg-white rounded-full shadow-lg hover:shadow-xl 
                                  border border-gray-100 transition-all duration-300
                                  hover:bg-indigo-50 active:scale-95"
-                        onClick={() => {
-                            const settingsTile = document.querySelector('[data-settings-tile]') as HTMLElement;
-                            settingsTile?.click();
-                        }}
-                    >
-                        <div className="w-6 h-6 text-slate-600 hover:text-indigo-600 transition-colors duration-200">
-                            <SettingsIcon />
-                        </div>
-                    </button>
+                    />
                 </div>
             </div>
         </>
@@ -368,28 +362,24 @@ function SettingsTile(props: {
 }) {
     const [showModal, setShowModal] = useState(false);
 
-    const onClick = () => {
-        setShowModal(true);
-    };
-
-    const onClose = () => {
-        setShowModal(false);
-    };
-
-    const onSubmit = () => {
-        onClose();
-    };
-
     return (
-        <div className={props.className}>
-            <Tile icon={props.icon} onClick={onClick} />
+        <>
+            <button
+                onClick={() => setShowModal(true)}
+                className={props.className}
+                data-settings-tile
+            >
+                <div className="w-6 h-6 text-slate-600 hover:text-indigo-600 transition-colors duration-200">
+                    {props.icon}
+                </div>
+            </button>
             <SettingsModal
                 show={showModal}
-                onSubmit={onSubmit}
-                onClose={onClose}
+                onSubmit={() => setShowModal(false)}
+                onClose={() => setShowModal(false)}
                 transcriber={props.transcriber}
             />
-        </div>
+        </>
     );
 }
 
