@@ -581,25 +581,6 @@ function SettingsModal(props: {
     );
 }
 
-function VerticalBar() {
-    return <div className='w-[1px] bg-slate-200'></div>;
-}
-
-function AudioDataBar(props: { progress: number }) {
-    return <ProgressBar progress={`${Math.round(props.progress * 100)}%`} />;
-}
-
-function ProgressBar(props: { progress: string }) {
-    return (
-        <div className='w-full rounded-full h-1 bg-gray-200 dark:bg-gray-700'>
-            <div
-                className='bg-blue-600 h-1 rounded-full transition-all duration-100'
-                style={{ width: props.progress }}
-            ></div>
-        </div>
-    );
-}
-
 function RecordTile(props: {
     icon: JSX.Element;
     text: string;
@@ -750,32 +731,6 @@ function RecordModal(props: {
         />
     );
 }
-
-function Tile(props: {
-    icon: JSX.Element;
-    text?: string;
-    onClick?: () => void;
-}) {
-    return (
-        <button
-            onClick={props.onClick}
-            className='group flex items-center justify-center rounded-xl p-3 bg-white text-slate-600 
-                     hover:text-indigo-600 hover:bg-indigo-50 active:scale-95
-                     shadow-sm hover:shadow border border-gray-100
-                     transition-all duration-200'
-        >
-            <div className='w-5 h-5 transition-transform duration-200 group-hover:scale-110'>
-                {props.icon}
-            </div>
-            {props.text && (
-                <div className='ml-2 font-medium text-sm'>
-                    {props.text}
-                </div>
-            )}
-        </button>
-    );
-}
-
 
 function SettingsIcon() {
     return (
